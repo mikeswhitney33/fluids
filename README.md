@@ -1,2 +1,2 @@
-# fluids
-An implementation of fluid simulation
+# Graphics
+An implementation of a graphics engine and various applications using said engine.
