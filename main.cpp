@@ -4,6 +4,7 @@ void processInput(GLFWwindow* window);
 
 int main(int argc, char** argv) {
     GLFWwindow* window = basic_setup("Hello World", 800, 600);
+
     while(!glfwWindowShouldClose(window)) {
         processInput(window);
 
