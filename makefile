@@ -18,6 +18,9 @@ main:
 run_main:
 	./$(MAIN_DIR)/main
 
+clean_main:
+	rm $(MAIN_DIR)/*
+
 triangle:
 	$(MAKE_DIR) $(TRIANGLE_DIR)
 	$(COMPILE) src/triangle_scene.cpp
@@ -28,6 +31,8 @@ triangle:
 run_triangle:
 	./$(TRIANGLE_DIR)/triangle
 
+clean_triangle:
+	rm $(TRIANGLE_DIR)/*
 
 clean:
 	rm $(MAIN_DIR)/* $(TRIANGLE_DIR)/*

@@ -1,5 +1,9 @@
 #include <graphics_scene.hpp>
 
+/*
+ * This Scene is an implementation of the Hello Triangle tutorial found at
+ * https://learnopengl.com/Getting-started/Hello-Triangle.
+ */
 
 #ifndef TRIANGLE_SCENE_H
 #define TRIANGLE_SCENE_H
@@ -89,7 +93,7 @@ protected:
         glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 
-    void AfterLoop(GLFWwindow* window) {
+    void PostLoop(GLFWwindow* window) {
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);
     }
@@ -106,7 +110,6 @@ private:
 };
 
 #endif
-
 
 int main(int argc, char** argv) {
     GraphicsScene* triscene = new TriangleScene();

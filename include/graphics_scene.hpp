@@ -1,10 +1,10 @@
+#ifndef GRAPHICS_SCENE_H
+#define GRAPHICS_SCENE_H
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <string>
 #include <iostream>
-
-#ifndef GRAPHICS_SCENE_H
-#define GRAPHICS_SCENE_H
 
 class GraphicsScene {
 public:
@@ -14,9 +14,9 @@ public:
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-        #ifdef __APPLE__
-            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        #endif
+    #ifdef __APPLE__
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    #endif
 
         window = glfwCreateWindow(width, height, title, NULL, NULL);
         if(window == NULL) {
@@ -56,7 +56,5 @@ private:
         glViewport(0, 0, width, height);
     }
 };
-
-
 
 #endif
