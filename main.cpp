@@ -1,18 +1,19 @@
-#include <graphics.hpp>
+#include <graphics_scene.hpp>
 
 
-class EmptyScene : public RenderScene {
+class EmptyScene : public GraphicsScene {
 public:
-    EmptyScene():RenderScene() {}
-    void Render(GLFWwindow* window) {
-        processInput(window);
+    EmptyScene():GraphicsScene("Empty", 800, 600){}
 
+protected:
+    void MidLoop() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+        
+        processInput();
     }
-
 private:
-    void processInput(GLFWwindow* window) {
+    void processInput() {
         if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             glfwSetWindowShouldClose(window, true);
         }
@@ -20,9 +21,8 @@ private:
 };
 
 int main(int argc, char** argv) {
-    GLFWwindow* window = basic_setup("Empty Scene", 800, 600);
-    RenderScene* empty = new EmptyScene();
-    basic_loop(window, empty);
+    GraphicsScene* empty = new EmptyScene();
+    empty->Render();
     delete empty;
     return 0;
 }

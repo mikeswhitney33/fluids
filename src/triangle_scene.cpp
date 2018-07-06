@@ -1,12 +1,15 @@
-#include <graphics.hpp>
+#include <graphics_scene.hpp>
 
 
 #ifndef TRIANGLE_SCENE_H
 #define TRIANGLE_SCENE_H
 
-class TriangleScene : public RenderScene {
+class TriangleScene : public GraphicsScene {
 public:
-    TriangleScene() {
+    TriangleScene():GraphicsScene("Triangle", 800, 600){}
+
+protected:
+    void PreLoop() {
         const char* v_code = "#version 330 core\n"
         "layout (location = 0) in vec3 aPos;\n"
         "void main() {\n"
@@ -75,8 +78,8 @@ public:
         glBindVertexArray(0);
     }
 
-    void Render(GLFWwindow* window) {
-        processInput(window);
+    void MidLoop() {
+        processInput();
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -95,7 +98,7 @@ private:
     unsigned int VBO;
     unsigned int VAO;
     int shaderProgram;
-    void processInput(GLFWwindow* window) {
+    void processInput() {
         if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             glfwSetWindowShouldClose(window, true);
         }
@@ -106,10 +109,9 @@ private:
 
 
 int main(int argc, char** argv) {
-    GLFWwindow* window = basic_setup("Triangle", 800, 600);
-    RenderScene* triscene = new TriangleScene();
-
-    basic_loop(window, triscene);
+    GraphicsScene* triscene = new TriangleScene();
+    triscene->Render();
+    delete triscene;
 
     return 0;
 }
