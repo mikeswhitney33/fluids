@@ -1,7 +1,11 @@
+#ifndef GRAPHICS_H
+#define GRAPHICS_H
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <string>
 #include <iostream>
+#include <render_scene.hpp>
 
 
 
@@ -46,3 +50,17 @@ GLFWwindow* basic_setup(std::string title, int width, int height) {
     make_adjustable_viewport(window, width, height);
     return window;
 }
+
+void basic_loop(GLFWwindow* window, RenderScene* renderScene) {
+    while(!glfwWindowShouldClose(window)) {
+        renderScene->Render(window);
+
+        // Check and call events and swap buffers
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+    renderScene->AfterLoop(window);
+    glfwTerminate();
+}
+
+#endif
