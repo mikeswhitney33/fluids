@@ -1,72 +1,57 @@
-#include <graphics_scene.hpp>
-
-/*
- * This Scene is an implementation of the Hello Triangle tutorial found at
- * https://learnopengl.com/Getting-started/Hello-Triangle.
- */
-
 #ifndef TRIANGLE_SCENE_H
 #define TRIANGLE_SCENE_H
+
+/*
+ * This Scene is an implementation of the Hello Triangle and Shader tutorials found at:
+ * https://learnopengl.com/Getting-started/Hello-Triangle. and
+ * https://learnopengl.com/Getting-started/Shaders
+ */
+
+#include <graphics_scene.hpp>
+#include <shader.hpp>
+#include <stb_image.h>
+#include <iostream>
 
 class TriangleScene : public GraphicsScene {
 public:
     TriangleScene():GraphicsScene("Triangle", 800, 600){}
+    ~TriangleScene() {
+         delete shader;
+    }
 
 protected:
     void PreLoop() {
-        const char* v_code = "#version 330 core\n"
-        "layout (location = 0) in vec3 aPos;\n"
-        "void main() {\n"
-        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-        "}\n\0";
-        unsigned int vertexShader;
-        vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader, 1, &v_code, NULL);
-        glCompileShader(vertexShader);
+        shader = new Shader("shaders/vertex/triangle.vert", "shaders/fragment/triangle.frag");
 
-        int success;
-        char infoLog[512];
-        glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-        if(!success) {
-            glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-            std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-        }
-
-        const char* f_code = "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "void main() {\n"
-        "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-        "}\n\0";
-        unsigned int fragmentShader;
-        fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader, 1, &f_code, NULL);
-        glCompileShader(fragmentShader);
-
-        glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-        if(!success) {
-            glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-            std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-        }
-
-        shaderProgram = glCreateProgram();
-        glAttachShader(shaderProgram, vertexShader);
-        glAttachShader(shaderProgram, fragmentShader);
-        glLinkProgram(shaderProgram);
-
-        glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-        if(!success) {
-            glGetShaderInfoLog(shaderProgram, 512, NULL, infoLog);
-            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-        }
-
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
-
-        float vertices[9] = {
-            -0.5f, -0.5f, 0.0f,
-             0.5f, -0.5f, 0.0f,
-             0.0f,  0.5f, 0.0f
+        float vertices[] = {
+            -0.2f, -0.2f, 0.0f, 1.0f, 1.0f, 0.0f,  0.0f, 0.0f,
+             0.2f, -0.2f, 0.0f, 1.0f, 1.0f, 0.0f,  1.0f, 0.0f,
+             0.0f,  0.2f, 0.0f, 1.0f, 1.0f, 0.0f,  0.5f, 1.0f
         };
+
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        int width, height, nrChannels;
+        stbi_set_flip_vertically_on_load(true);
+        unsigned char* data = stbi_load("resources/wall.jpg", &width, &height, &nrChannels, 0);
+
+        if(data) {
+            if(nrChannels == 3) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+                glGenerateMipmap(GL_TEXTURE_2D);
+            }
+            else if(nrChannels == 4) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+                glGenerateMipmap(GL_TEXTURE_2D);
+            }
+        }
+        stbi_image_free(data);
 
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
@@ -76,10 +61,20 @@ protected:
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+        //vertex
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) 0);
         glEnableVertexAttribArray(0);
+        //color
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+        //texture
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (6 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
+
+
     }
 
     void MidLoop() {
@@ -88,9 +83,20 @@ protected:
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderProgram);
+        shader->use();
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBindTexture(GL_TEXTURE_2D, texture);
+
+
+        float x_offsets[] = {0.0f, 0.2f, -0.2f};
+        float y_offsets[] = {0.2f, -0.2f, -0.2f};
+
+        for(int i = 0;i < 3;i++) {
+            shader->setFloat("x_offset", x_offsets[i]);
+            shader->setFloat("y_offset", y_offsets[i]);
+
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+        }
     }
 
     void PostLoop(GLFWwindow* window) {
@@ -101,7 +107,10 @@ protected:
 private:
     unsigned int VBO;
     unsigned int VAO;
-    int shaderProgram;
+    unsigned int texture;
+
+    Shader* shader;
+
     void processInput() {
         if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             glfwSetWindowShouldClose(window, true);

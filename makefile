@@ -5,6 +5,7 @@ CC = g++
 INCLUDES = -Iinclude
 C = -x c
 CPP = -x c++
+STB = include/stb_image.cpp
 
 ifeq ($(TARGETOS), Darwin)
 	DEPS = -Imac_deps
@@ -19,9 +20,14 @@ endif
 MAIN_DIR = build/main
 TRIANGLE_DIR = build/triangle
 
+IN_FILE = main.cpp
+OUT_FILE = -o $(MAIN_DIR)/main
+
+COMPILE = $(CC) $(DEPS) $(INCLUDES) $(C) $(GLAD) $(CPP) $(STB) $(IN_FILE) $(OUT_FILE) $(FLAGS)
+
 main:
 	$(MAKE_DIR) $(MAIN_DIR)
-	$(CC) $(DEPS) $(INCLUDES) $(C) $(GLAD) $(CPP) main.cpp -o $(MAIN_DIR)/main $(FLAGS)
+	$(COMPILE)
 
 run_main:
 	./$(MAIN_DIR)/main
@@ -31,7 +37,9 @@ clean_main:
 
 triangle:
 	$(MAKE_DIR) $(TRIANGLE_DIR)
-	$(CC) $(DEPS) $(INCLUDES) $(C) $(GLAD) $(CPP) src/triangle_scene.cpp -o $(TRIANGLE_DIR)/triangle $(FLAGS)
+	$(eval IN_FILE := src/triangle_scene.cpp)
+	$(eval OUT_FILE := -o $(TRIANGLE_DIR)/triangle)
+	$(COMPILE)
 
 run_triangle:
 	./$(TRIANGLE_DIR)/triangle

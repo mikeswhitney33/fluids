@@ -83,7 +83,7 @@ private:
         if(type != "PROGRAM") {
             glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
             if(!success) {
-                glGetShaderInfoLog(shader, 1024, NULL< infoLog);
+                glGetShaderInfoLog(shader, 1024, NULL, infoLog);
                 std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- ---------------------------------------------------- --" << std::endl;
             }
         }
