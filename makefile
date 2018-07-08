@@ -6,14 +6,12 @@ INCLUDES = -Iinclude
 C = -x c
 CPP = -x c++
 STB = include/stb_image.cpp
+GLAD = deps/glad.c
+DEPS = -Ideps
 
 ifeq ($(TARGETOS), Darwin)
-	DEPS = -Imac_deps
-	GLAD = mac_deps/glad.c
 	FLAGS = -lglfw -lassimp
 else
-	DEPS = -Ilinux_deps
-	GLAD = linux_deps/glad.c
 	FLAGS = -lglfw3 -lGL -lX11 -lXi -lXrandr -lXxf86vm -lXinerama -lXcursor -lrt -lm -pthread -ldl
 endif
 
@@ -58,7 +56,7 @@ run_cube:
 	./$(CUBE_DIR)/cube
 
 clean_cube:
-		rm $(CUBE_DIR)/*
+	rm $(CUBE_DIR)/*
 
 clean:
 	rm $(MAIN_DIR)/* $(TRIANGLE_DIR)/* $(CUBE_DIR)/*
