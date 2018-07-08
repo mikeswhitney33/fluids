@@ -6,9 +6,12 @@
 #include <string>
 #include <iostream>
 
+
 class GraphicsScene {
 public:
     GraphicsScene(const char* title, int width, int height) {
+        screen_width = width;
+        screen_height = height;
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -30,6 +33,9 @@ public:
             exit(EXIT_FAILURE);
         }
         glViewport(0, 0, width, height);
+
+        glfwSetWindowUserPointer(window, this);
+
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     }
 
@@ -46,14 +52,24 @@ public:
         glfwTerminate();
     }
 
+
+
 protected:
     GLFWwindow* window;
+    int screen_width, screen_height;
+
+private:
+    virtual void resized(int w, int h) {
+        screen_width = w;
+        screen_height = h;
+    }
     virtual void PreLoop(){};
     virtual void MidLoop(){};
     virtual void PostLoop(){};
-private:
     static void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
         glViewport(0, 0, width, height);
+        GraphicsScene* gc = static_cast<GraphicsScene*>(glfwGetWindowUserPointer(window));
+        gc->resized(width, height);
     }
 };
 

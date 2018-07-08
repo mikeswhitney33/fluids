@@ -19,7 +19,7 @@ public:
          delete shader;
     }
 
-protected:
+private:
     void PreLoop() {
         shader = new Shader("shaders/vertex/triangle.vert", "shaders/fragment/triangle.frag");
 
@@ -104,7 +104,6 @@ protected:
         glDeleteBuffers(1, &VBO);
     }
 
-private:
     unsigned int VBO;
     unsigned int VAO;
     unsigned int texture;

@@ -19,6 +19,7 @@ endif
 
 MAIN_DIR = build/main
 TRIANGLE_DIR = build/triangle
+CUBE_DIR = build/cube
 
 IN_FILE = main.cpp
 OUT_FILE = -o $(MAIN_DIR)/main
@@ -47,5 +48,17 @@ run_triangle:
 clean_triangle:
 	rm $(TRIANGLE_DIR)/*
 
+cube:
+	$(MAKE_DIR) $(CUBE_DIR)
+	$(eval IN_FILE := src/cube_scene.cpp)
+	$(eval OUT_FILE := -o $(CUBE_DIR)/cube)
+	$(COMPILE)
+
+run_cube:
+	./$(CUBE_DIR)/cube
+
+clean_cube:
+		rm $(CUBE_DIR)/*
+
 clean:
-	rm $(MAIN_DIR)/* $(TRIANGLE_DIR)/*
+	rm $(MAIN_DIR)/* $(TRIANGLE_DIR)/* $(CUBE_DIR)/*
