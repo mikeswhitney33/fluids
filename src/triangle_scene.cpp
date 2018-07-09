@@ -78,8 +78,6 @@ private:
     }
 
     void MidLoop() {
-        processInput();
-
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -109,12 +107,6 @@ private:
     unsigned int texture;
 
     Shader* shader;
-
-    void processInput() {
-        if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-            glfwSetWindowShouldClose(window, true);
-        }
-    }
 };
 
 #endif

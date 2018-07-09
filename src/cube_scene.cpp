@@ -1,7 +1,7 @@
 #ifndef CUBE_SCENE_H
 #define CUBE_SCENE_H
 
-#include <graphics_scene.hpp>
+#include <camera_scene.hpp>
 #include <stb_image.h>
 #include <shader.hpp>
 #include <camera.hpp>
@@ -22,14 +22,13 @@ static const glm::vec3 cubePositions[10] = {
     glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
-class CubeScene : public GraphicsScene {
+class CubeScene : public CameraScene {
 public:
-    CubeScene():GraphicsScene("Cube", 800, 600){}
-    ~CubeScene() {delete shader;delete camera;}
+    CubeScene():CameraScene("Cube", 800, 600){}
+    ~CubeScene() {delete shader;}
 private:
     void PreLoop() {
 
-        glEnable(GL_DEPTH_TEST);
         float vertices[] = {
             -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
              0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -100,23 +99,9 @@ private:
         shader->use();
         shader->setInt("texture1", 0);
         shader->setInt("texture2", 1);
-
-        deltaTime = 0.0f;
-        lastFrame = 0.0f;
-        lastX = screen_width / 2.0f;
-        lastY = screen_height / 2.0f;
-        firstMouse = true;
-
-        glfwSetCursorPosCallback(window, mouse_callback);
-        glfwSetScrollCallback(window, scroll_callback);
     }
 
     void MidLoop() {
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-
-        processInput();
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -163,87 +148,6 @@ private:
     unsigned int texture2;
 
     Shader* shader;
-    Camera* camera;
-
-    float deltaTime;
-    float lastFrame;
-    float lastX;
-    float lastY;
-    bool firstMouse;
-
-    void processInput() {
-        if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-            glfwSetWindowShouldClose(window, true);
-        }
-        if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            camera->ProcessKeyboard(FORWARD, deltaTime);
-        }
-        if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-            camera->ProcessKeyboard(LEFT, deltaTime);
-        }
-        if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-            camera->ProcessKeyboard(BACKWARD, deltaTime);
-        }
-        if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-            camera->ProcessKeyboard(RIGHT, deltaTime);
-        }
-    }
-    unsigned int read_texture(const std::string &name, bool flip = true) {
-        unsigned int tex;
-        glGenTextures(1, &tex);
-        glBindTexture(GL_TEXTURE_2D, tex);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        int width, height, nrChannels;
-        stbi_set_flip_vertically_on_load(flip);
-        unsigned char* data = stbi_load(name.c_str(), &width, &height, &nrChannels, 0);
-        if(data) {
-            if(nrChannels == 3) {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-                glGenerateMipmap(GL_TEXTURE_2D);
-            }
-            else if(nrChannels == 4) {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-                glGenerateMipmap(GL_TEXTURE_2D);
-            }
-            else {
-                std::cout << "nrChannels: " << nrChannels << std::endl;
-            }
-        }
-        else {
-            std::cout << "Failed to load texture: " << name << std::endl;
-        }
-        stbi_image_free(data);
-        return tex;
-    }
-    static void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-        CubeScene* scene = static_cast<CubeScene*>(glfwGetWindowUserPointer(window));
-        if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-            if(scene->firstMouse) {
-                scene->lastX = xpos;
-                scene->lastY = ypos;
-                scene->firstMouse = false;
-            }
-
-            float x_offset = xpos - scene->lastX;
-            float y_offset = scene->lastY - ypos;
-
-            scene->lastX = xpos;
-            scene->lastY = ypos;
-
-            scene->camera->ProcessMouseMovement(-x_offset, -y_offset);
-        }
-        else {
-            scene->firstMouse = true;
-        }
-    }
-    static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-        CubeScene* scene = static_cast<CubeScene*>(glfwGetWindowUserPointer(window));
-        scene->camera->ProcessMouseScroll(yoffset);
-    }
 };
 
 #endif

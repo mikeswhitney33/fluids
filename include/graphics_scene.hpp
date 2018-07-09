@@ -5,6 +5,8 @@
 #include <GLFW/glfw3.h>
 #include <string>
 #include <iostream>
+#include <stdlib.h>
+#include <stb_image.h>
 
 
 class GraphicsScene {
@@ -42,6 +44,7 @@ public:
     void Render() {
         PreLoop();
         while(!glfwWindowShouldClose(window)) {
+            processInput();
             MidLoop();
 
             // Check and call events and swap buffers
@@ -57,6 +60,44 @@ public:
 protected:
     GLFWwindow* window;
     int screen_width, screen_height;
+    virtual void processInput() {
+        if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+            glfwSetWindowShouldClose(window, true);
+        }
+    }
+
+    static unsigned int read_texture(const std::string &name, bool flip = true) {
+        unsigned int tex;
+        glGenTextures(1, &tex);
+        glBindTexture(GL_TEXTURE_2D, tex);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        int width, height, nrChannels;
+        stbi_set_flip_vertically_on_load(flip);
+        unsigned char* data = stbi_load(name.c_str(), &width, &height, &nrChannels, 0);
+        if(data) {
+            if(nrChannels == 3) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+                glGenerateMipmap(GL_TEXTURE_2D);
+            }
+            else if(nrChannels == 4) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+                glGenerateMipmap(GL_TEXTURE_2D);
+            }
+            else {
+                std::cout << "nrChannels: " << nrChannels << std::endl;
+            }
+        }
+        else {
+            std::cout << "Failed to load texture: " << name << std::endl;
+        }
+        stbi_image_free(data);
+        return tex;
+    }
+
 
 private:
     virtual void resized(int w, int h) {
@@ -66,6 +107,7 @@ private:
     virtual void PreLoop(){};
     virtual void MidLoop(){};
     virtual void PostLoop(){};
+
     static void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
         glViewport(0, 0, width, height);
         GraphicsScene* gc = static_cast<GraphicsScene*>(glfwGetWindowUserPointer(window));

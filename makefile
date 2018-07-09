@@ -18,6 +18,7 @@ endif
 MAIN_DIR = build/main
 TRIANGLE_DIR = build/triangle
 CUBE_DIR = build/cube
+TERRAIN_DIR = build/terrain
 
 IN_FILE = main.cpp
 OUT_FILE = -o $(MAIN_DIR)/main
@@ -57,6 +58,18 @@ run_cube:
 
 clean_cube:
 	rm $(CUBE_DIR)/*
+
+terrain:
+	$(MAKE_DIR) $(TERRAIN_DIR)
+	$(eval IN_FILE := src/terrain_scene.cpp)
+	$(eval OUT_FILE := -o $(TERRAIN_DIR)/terrain)
+	$(COMPILE)
+
+run_terrain:
+	./$(TERRAIN_DIR)/terrain
+
+clean_terrain:
+	rm $(TERRAIN_DIR)/*
 
 clean:
 	rm $(MAIN_DIR)/* $(TRIANGLE_DIR)/* $(CUBE_DIR)/*
