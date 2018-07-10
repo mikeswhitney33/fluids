@@ -4,6 +4,16 @@
 #include <math.h>
 #include <vector>
 #include <iostream>
+#include <glm/glm.hpp>
+
+struct Index {
+    Index(int _i, int _j) {
+        i = _i;
+        j = _j;
+    }
+    int i;
+    int j;
+};
 
 class RandomTerrain {
 public:
@@ -31,18 +41,66 @@ public:
         delete [] grid;
     }
 
+//      a--b--c
+//      |\ |\ |
+//      | \| \|
+//      d--e--f
+//      |\ |\ |
+//      | \| \|
+//      g--h--i
+
+    std::vector<float> getVertsXYZN() {
+        std::vector<float> verts;
+
+        for(int i = 0;i < size;i++) {
+            for(int j = 0;j < size;j++) {
+                float x_val = getVal(i);
+                float z_val = getVal(j);
+
+                verts.push_back(x_val);
+                verts.push_back(grid[i][j]);
+                verts.push_back(z_val);
+
+                std::vector<glm::vec3> vecs;
+                Index a(i-1, j-1);
+                Index b(i-1, j);
+                Index c(i-1, j+1);
+                Index d(i, j-1);
+                Index e(i, j);
+                Index f(i, j+1);
+                Index g(i+1, j-1);
+                Index h(i+1, j);
+                Index k(i+1, j+1);
+                addIndex(vecs, a, b, e);
+                addIndex(vecs, b, f, e);
+                addIndex(vecs, b, c, f);
+                addIndex(vecs, a, e, d);
+                addIndex(vecs, d, e, h);
+                addIndex(vecs, d, h, g);
+                addIndex(vecs, e, k, h);
+                addIndex(vecs, e, f, k);
+
+                glm::vec3 normal = interpNormals(vecs);
+                verts.push_back(normal.x);
+                verts.push_back(normal.y);
+                verts.push_back(normal.z);
+
+
+            }
+        }
+        return verts;
+    }
+
+
+
     std::vector<float> getVertsXYZ() {
         std::vector<float> verts;
 
-        float x_offset = 2.0f / (float)size;
-        float z_offset = 2.0f / (float)size;
-        float x = -1.0f;
-        float z = -1.0f;
         for(int i = 0;i < size;i++) {
             for(int j = 0;j < size;j++) {
-                verts.push_back(x + ((float) i) * x_offset);
+                verts.push_back(getVal(i));
                 verts.push_back(grid[i][j]);
-                verts.push_back(z * ((float) j) * z_offset);
+                verts.push_back(getVal(j));
             }
         }
         return verts;
@@ -64,6 +122,14 @@ public:
         return faces;
     }
 
+    float getMaxValue() {
+        return getExtrema(-9999.0f, greater);
+    }
+
+    float getMinValue() {
+        return getExtrema(9999.0f, less);
+    }
+
 private:
     float** grid;
     int size;
@@ -72,11 +138,72 @@ private:
     float max_val;
     float random_range;
 
+    glm::vec3 interpNormals(std::vector<glm::vec3> normals) {
+        glm::vec3 avg(0, 0, 0);
+        for(int i = 0; i < normals.size();i++) {
+            avg += normals[i];
+        }
+        return avg / (float)normals.size();
+    }
+
+    glm::vec3 triNormal(glm::vec3 a, glm::vec3 b, glm::vec3 c) {
+        glm::vec3 U = b - a;
+        glm::vec3 V = c - a;
+        return glm::cross(U, V);
+    }
+
+    glm::vec3 getVertex(Index i) {
+        return glm::vec3(getVal(i.i), grid[i.i][i.j], getVal(i.j));
+    }
+
+    void addIndex(std::vector<glm::vec3> &vec, Index a, Index b, Index c) {
+        if(inBounds(a) && inBounds(b)&& inBounds(c)) {
+            vec.push_back(triNormal(getVertex(a), getVertex(b), getVertex(c)));
+        }
+    }
+
+    bool inBounds(Index i) {
+        return i.i >= 0 && i.j >= 0 && i.i < size && i.j < size;
+    }
+
+    float getVal(float idx) {
+        float offset = 2.0f / (float)size;
+        return -1.0f + idx * offset;
+        // float x_offset = 2.0f / (float)size;
+        // float z_offset = 2.0f / (float)size;
+        // float x = -1.0f;
+        // float z = -1.0f;
+        // for(int i = 0;i < size;i++) {
+        //     for(int j = 0;j < size;j++) {
+        //         float x_val = x + ((float) i) * x_offset;
+        //         float z_val = z * ((float) j) * z_offset;
+    }
+
+    static bool less(float a, float b) {
+        return a < b;
+    }
+
+    static bool greater(float a, float b) {
+        return a > b;
+    }
+
+    float getExtrema(float init, bool (*comparater)(float, float)) {
+        float extreme = init;
+        for(int i = 0;i < size;i++) {
+            for(int j = 0;j < size;j++) {
+                if(comparater(grid[i][j], extreme)) {
+                    extreme = grid[i][j];
+                }
+            }
+        }
+        return extreme;
+    }
+
     void corners() {
-        grid[0][0] = 0;//randomValue(-range, range);
-        grid[0][size - 1] = 0;//randomValue(-range, range);
-        grid[size - 1][0] = 0;//randomValue(-range, range);
-        grid[size - 1][size - 1] = 0;//randomValue(-range, range);
+        grid[0][0] = 0;
+        grid[0][size - 1] = 0;
+        grid[size - 1][0] = 0;
+        grid[size - 1][size - 1] = 0;
     }
     void diamondStep(int sideLength, int halfSide) {
         for(int x = 0;x < size-1;x+=halfSide) {
