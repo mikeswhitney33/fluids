@@ -9,6 +9,8 @@ STB = include/stb_image.cpp
 GLAD = deps/glad.c
 DEPS = -Ideps
 
+
+
 ifeq ($(TARGETOS), Darwin)
 	FLAGS = -lglfw -lassimp
 else

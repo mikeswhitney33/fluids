@@ -3,6 +3,7 @@ out vec4 FragColor;
 
 in vec3 Position;
 in vec3 Normal;
+in vec2 TexCoord;
 
 const vec3 GREEN = vec3(0.0, 0.5, 0.01);
 const vec3 WHITE = vec3(1.0, 1.0, 1.0);
@@ -16,17 +17,33 @@ uniform vec3 viewPos;
 uniform vec3 lightPos;
 uniform vec3 lightColor;
 
+uniform sampler2D texture1;
+uniform sampler2D texture2;
+
 
 
 void main() {
+    vec3 norm = normalize(Normal);
     float range = max_val - min_val;
-    float percent =  (Position.y - min_val) / range;
-    vec3 objectColor = mix(GREEN, WHITE, percent);
+    float colorPercent =  (Position.y - min_val) / range;
+
+    vec4 texColor;
+    float normalPercent = dot(norm, vec3(0.0f, 1.0f, 0.0f));
+    if(normalPercent > 0.5f) {
+        texColor = texture(texture2, TexCoord);
+    }
+    else {
+        texColor = texture(texture1, TexCoord);
+    }
+    vec3 objectTexColor = vec3(texColor.r, texColor.g, texColor.b);
+    vec3 objectCColor = mix(GREEN, WHITE, colorPercent);
+    vec3 objectColor = mix(objectCColor, objectTexColor, 0.5f);
+    // vec3 objectColor = mix(GREEN, WHITE, percent);
 
     float ambientStrength = 0.1;
     vec3 ambient = ambientStrength * lightColor;
 
-    vec3 norm = normalize(Normal);
+
     vec3 lightDir = normalize(lightPos - Position);
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * lightColor;

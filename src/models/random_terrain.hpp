@@ -49,6 +49,67 @@ public:
 //      | \| \|
 //      g--h--i
 
+    std::vector<float> getVertsXYZNT() {
+        std::vector<float> verts;
+
+        for(int i = 0;i < size - 1;i++) {
+            for(int j = 0;j < size - 1;j++) {
+                float ax_val, az_val,bx_val, bz_val, ex_val, ez_val, dx_val, dz_val;
+                ax_val = getVal(i); az_val = getVal(j);
+                bx_val = getVal(i + 1); bz_val = az_val;
+                ex_val = bx_val; ez_val = getVal(j + 1);
+                dx_val = ax_val; dz_val = ez_val;
+
+                // A
+                addVertXYZ(verts, i, j, ax_val, az_val);
+                addVertN(verts, i, j, ax_val, az_val);
+                verts.push_back(0.0f);
+                verts.push_back(0.0f);
+
+                // B
+                addVertXYZ(verts, i + 1, j, bx_val, bz_val);
+                addVertN(verts, i + 1, j, bx_val, bz_val);
+                verts.push_back(1.0f);
+                verts.push_back(0.0f);
+
+                // E
+                addVertXYZ(verts, i + 1, j + 1, ex_val, ez_val);
+                addVertN(verts, i + 1, j + 1, ex_val, ez_val);
+                verts.push_back(1.0f);
+                verts.push_back(1.0f);
+
+                // A
+                addVertXYZ(verts, i, j, ax_val, az_val);
+                addVertN(verts, i, j, ax_val, az_val);
+                verts.push_back(0.0f);
+                verts.push_back(0.0f);
+
+                // E
+                addVertXYZ(verts, i + 1, j + 1, ex_val, ez_val);
+                addVertN(verts, i + 1, j + 1, ex_val, ez_val);
+                verts.push_back(1.0f);
+                verts.push_back(1.0f);
+
+                // D
+                addVertXYZ(verts, i, j + 1, dx_val, dz_val);
+                addVertN(verts, i, j + 1, dx_val, dz_val);
+                verts.push_back(0.0f);
+                verts.push_back(1.0f);
+
+
+                // glm::vec3 b = glm::vec3(getVal(i + 1), grid[i+1][j], getVal(j));
+
+                // float x_val = getVal(i);
+                // float z_val = getVal(j);
+                // addVertXYZ(verts, i, j, x_val, z_val);
+                //
+                // addVertN(verts, i, j, x_val, z_val);
+
+            }
+        }
+        return verts;
+    }
+
     std::vector<float> getVertsXYZN() {
         std::vector<float> verts;
 
@@ -57,35 +118,8 @@ public:
                 float x_val = getVal(i);
                 float z_val = getVal(j);
 
-                verts.push_back(x_val);
-                verts.push_back(grid[i][j]);
-                verts.push_back(z_val);
-
-                std::vector<glm::vec3> vecs;
-                Index a(i-1, j-1);
-                Index b(i-1, j);
-                Index c(i-1, j+1);
-                Index d(i, j-1);
-                Index e(i, j);
-                Index f(i, j+1);
-                Index g(i+1, j-1);
-                Index h(i+1, j);
-                Index k(i+1, j+1);
-                addIndex(vecs, a, b, e);
-                addIndex(vecs, b, f, e);
-                addIndex(vecs, b, c, f);
-                addIndex(vecs, a, e, d);
-                addIndex(vecs, d, e, h);
-                addIndex(vecs, d, h, g);
-                addIndex(vecs, e, k, h);
-                addIndex(vecs, e, f, k);
-
-                glm::vec3 normal = interpNormals(vecs);
-                verts.push_back(normal.x);
-                verts.push_back(normal.y);
-                verts.push_back(normal.z);
-
-
+                addVertXYZ(verts, i, j, x_val, z_val);
+                addVertN(verts, i, j, x_val, z_val);
             }
         }
         return verts;
@@ -98,9 +132,7 @@ public:
 
         for(int i = 0;i < size;i++) {
             for(int j = 0;j < size;j++) {
-                verts.push_back(getVal(i));
-                verts.push_back(grid[i][j]);
-                verts.push_back(getVal(j));
+                addVertXYZ(verts, i, j, getVal(i), getVal(j));
             }
         }
         return verts;
@@ -138,6 +170,38 @@ private:
     float max_val;
     float random_range;
 
+    void addVertXYZ(std::vector<float> &verts, int i, int j, float x_val, float z_val) {
+        verts.push_back(x_val);
+        verts.push_back(grid[i][j]);
+        verts.push_back(z_val);
+    }
+
+    void addVertN(std::vector<float> &verts, int i, int j, float x_val, float z_val) {
+        std::vector<glm::vec3> vecs;
+        Index a(i-1, j-1);
+        Index b(i-1, j);
+        Index c(i-1, j+1);
+        Index d(i, j-1);
+        Index e(i, j);
+        Index f(i, j+1);
+        Index g(i+1, j-1);
+        Index h(i+1, j);
+        Index k(i+1, j+1);
+        addIndex(vecs, a, b, e);
+        addIndex(vecs, b, f, e);
+        addIndex(vecs, b, c, f);
+        addIndex(vecs, a, e, d);
+        addIndex(vecs, d, e, h);
+        addIndex(vecs, d, h, g);
+        addIndex(vecs, e, k, h);
+        addIndex(vecs, e, f, k);
+
+        glm::vec3 normal = interpNormals(vecs);
+        verts.push_back(normal.x);
+        verts.push_back(normal.y);
+        verts.push_back(normal.z);
+    }
+
     glm::vec3 interpNormals(std::vector<glm::vec3> normals) {
         glm::vec3 avg(0, 0, 0);
         for(int i = 0; i < normals.size();i++) {
@@ -169,14 +233,6 @@ private:
     float getVal(float idx) {
         float offset = 2.0f / (float)size;
         return -1.0f + idx * offset;
-        // float x_offset = 2.0f / (float)size;
-        // float z_offset = 2.0f / (float)size;
-        // float x = -1.0f;
-        // float z = -1.0f;
-        // for(int i = 0;i < size;i++) {
-        //     for(int j = 0;j < size;j++) {
-        //         float x_val = x + ((float) i) * x_offset;
-        //         float z_val = z * ((float) j) * z_offset;
     }
 
     static bool less(float a, float b) {
