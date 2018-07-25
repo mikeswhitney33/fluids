@@ -21,6 +21,7 @@ MAIN_DIR = build/main
 TRIANGLE_DIR = build/triangle
 CUBE_DIR = build/cube
 TERRAIN_DIR = build/terrain
+BILLBOARD_DIR = build/billboard
 
 IN_FILE = main.cpp
 OUT_FILE = -o $(MAIN_DIR)/main
@@ -72,6 +73,19 @@ run_terrain:
 
 clean_terrain:
 	rm $(TERRAIN_DIR)/*
+
+
+billboard:
+	$(MAKE_DIR) $(BILLBOARD_DIR)
+	$(eval IN_FILE := src/test_billboards.cpp)
+	$(eval OUT_FILE := -o $(BILLBOARD_DIR)/billboard)
+	$(COMPILE)
+
+run_billboard:
+	./$(BILLBOARD_DIR)/billboard
+
+clean_billboard:
+	rm $(BILLBOARD_DIR)/*
 
 clean:
 	rm $(MAIN_DIR)/* $(TRIANGLE_DIR)/* $(CUBE_DIR)/*

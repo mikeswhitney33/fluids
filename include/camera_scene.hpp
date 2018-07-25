@@ -6,8 +6,8 @@
 
 class CameraScene : public GraphicsScene {
 public:
-    CameraScene(const char* title, int width, int height):GraphicsScene(title, width, height){
-        camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+    CameraScene(const char* title, int width, int height):camera(glm::vec3(0.0f, 0.0f, 3.0f)),GraphicsScene(title, width, height){
+        // camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f));
         deltaTime = 0.0f;
         lastFrame = 0.0f;
         lastX = screen_width / 2;
@@ -17,9 +17,9 @@ public:
         glfwSetScrollCallback(window, scroll_callback);
         glEnable(GL_DEPTH_TEST);
     }
-    virtual ~CameraScene() {delete camera;}
+    virtual ~CameraScene() {}
 protected:
-    Camera* camera;
+    Camera camera;
 
     virtual void processInput() {
         float currentFrame = glfwGetTime();
@@ -28,22 +28,22 @@ protected:
 
         GraphicsScene::processInput();
         if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            camera->ProcessKeyboard(FORWARD, deltaTime);
+            camera.ProcessKeyboard(FORWARD, deltaTime);
         }
         if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-            camera->ProcessKeyboard(LEFT, deltaTime);
+            camera.ProcessKeyboard(LEFT, deltaTime);
         }
         if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-            camera->ProcessKeyboard(BACKWARD, deltaTime);
+            camera.ProcessKeyboard(BACKWARD, deltaTime);
         }
         if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-            camera->ProcessKeyboard(RIGHT, deltaTime);
+            camera.ProcessKeyboard(RIGHT, deltaTime);
         }
         if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-            camera->ProcessKeyboard(UP, deltaTime);
+            camera.ProcessKeyboard(UP, deltaTime);
         }
         if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-            camera->ProcessKeyboard(DOWN, deltaTime);
+            camera.ProcessKeyboard(DOWN, deltaTime);
         }
     }
 private:
@@ -70,7 +70,7 @@ private:
             scene->lastX = xpos;
             scene->lastY = ypos;
 
-            scene->camera->ProcessMouseMovement(-x_offset, -y_offset);
+            scene->camera.ProcessMouseMovement(-x_offset, -y_offset);
         }
         else {
             scene->firstMouse = true;
@@ -78,7 +78,7 @@ private:
     }
     static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
         CameraScene* scene = static_cast<CameraScene*>(glfwGetWindowUserPointer(window));
-        scene->camera->ProcessMouseScroll(yoffset);
+        scene->camera.ProcessMouseScroll(yoffset);
     }
 };
 

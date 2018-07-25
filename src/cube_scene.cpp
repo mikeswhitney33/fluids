@@ -73,7 +73,7 @@ private:
             -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
         };
         shader = new Shader("shaders/vertex/cube.vert", "shaders/fragment/cube.frag");
-        camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+        // camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f));
         texture1 = read_texture("resources/container.jpg");
         texture2 = read_texture("resources/awesomeface.png");
 
@@ -117,7 +117,7 @@ private:
         glm::mat4 view(1);
         glm::mat4 projection(1);
 
-        view = camera->GetViewMatrix();
+        view = camera.GetViewMatrix();
         projection = glm::perspective(glm::radians(45.0f), (float)screen_width / (float) screen_height, 0.1f, 100.0f);
         shader->setMat4("view", view);
         shader->setMat4("projection", projection);
@@ -136,7 +136,7 @@ private:
         }
     }
 
-    void PostLoop(GLFWwindow* window) {
+    void PostLoop() {
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);
     }

@@ -95,16 +95,6 @@ public:
                 addVertN(verts, i, j + 1, dx_val, dz_val);
                 verts.push_back(0.0f);
                 verts.push_back(1.0f);
-
-
-                // glm::vec3 b = glm::vec3(getVal(i + 1), grid[i+1][j], getVal(j));
-
-                // float x_val = getVal(i);
-                // float z_val = getVal(j);
-                // addVertXYZ(verts, i, j, x_val, z_val);
-                //
-                // addVertN(verts, i, j, x_val, z_val);
-
             }
         }
         return verts;
