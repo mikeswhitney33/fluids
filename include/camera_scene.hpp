@@ -46,8 +46,9 @@ protected:
             camera.ProcessKeyboard(DOWN, deltaTime);
         }
     }
-private:
     float deltaTime;
+private:
+
     float lastFrame;
     float lastX;
     float lastY;

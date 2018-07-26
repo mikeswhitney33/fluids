@@ -10,7 +10,7 @@
 
 class BillboardScene : public CameraScene {
 public:
-    BillboardScene():fluid(1000),CameraScene("BillBoard", 800, 600){}
+    BillboardScene():fluid(2.0f, 20),CameraScene("BillBoard", 800, 600){}
     ~BillboardScene() {}
 private:
     Fluid fluid;
@@ -25,7 +25,7 @@ private:
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)screen_width / (float) screen_height, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
 
-        fluid.render(projection, view);
+        fluid.render(projection, view, deltaTime);
     }
 };
 
