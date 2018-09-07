@@ -3,6 +3,7 @@
 
 #include <camera_scene.hpp>
 #include "models/fluid.hpp"
+#include "models/particle_fluid.hpp"
 #include <camera.hpp>
 #include <time.h>
 
@@ -10,10 +11,10 @@
 
 class BillboardScene : public CameraScene {
 public:
-    BillboardScene():fluid(2.0f, 20),CameraScene("BillBoard", 800, 600){}
+    BillboardScene():fluid(20, 0.5f),CameraScene("BillBoard", 800, 600){}
     ~BillboardScene() {}
 private:
-    Fluid fluid;
+    ParticleFluid fluid;
     virtual void PreLoop(){
 
     }

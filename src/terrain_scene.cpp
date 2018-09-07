@@ -87,7 +87,7 @@ private:
 
         model = glm::scale(model, glm::vec3(3.0f, 1.0f, 3.0f));
 
-        view = camera->GetViewMatrix();
+        view = camera.GetViewMatrix();
         projection = glm::perspective(glm::radians(45.0f), (float)screen_width / (float) screen_height, 0.1f, 100.0f);
         shader->setMat4("view", view);
         shader->setMat4("projection", projection);
@@ -95,7 +95,7 @@ private:
 
         shader->setFloat("min_val", min_val);
         shader->setFloat("max_val", max_val);
-        shader->setVec3("viewPos", camera->Position);
+        shader->setVec3("viewPos", camera.Position);
         shader->setVec3("lightPos", glm::vec3(1.0f, 1.0f, 0.0f));
         shader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
         // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);

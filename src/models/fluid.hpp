@@ -4,6 +4,7 @@
 #include "billboard.hpp"
 #include <vector>
 #include <map>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/component_wise.hpp>
 
 enum CellType {FLUID, SOLID, AIR};
@@ -101,7 +102,7 @@ private:
         }
         locations[0] = current_particles;
         for(int i = 1;i < max_frames;i++) {
-            std::cout << i << ": Stepping: " << grid.size() << std::endl;
+            // std::cout << i << ": Stepping: " << grid.size() << std::endl;
             step(1.0f / 60.0f, current_particles);
             locations[i] = current_particles;
         }
@@ -132,6 +133,10 @@ private:
         v.y = getInterpolatedValue(particle.x / height - 0.5f, particle.y / height, particle.z / height - 0.5f, 1);
         v.z = getInterpolatedValue(particle.x / height - 0.5f, particle.y / height - 0.5f, particle.z / height, 2);
         return v;
+    }
+
+    float getInterpolatedValue(float x, float y, float z, int idx) {
+        return 0;
     }
 
     void updateGrid(std::vector<glm::vec3> &particles) {
